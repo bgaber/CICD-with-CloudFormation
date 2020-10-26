@@ -1,0 +1,98 @@
+#https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/AWS_EC2.html
+
+# Simple CloudFormation Template for testing the IAC-CICD-CodePipeline-Deployment.yml template.
+# This template creates simple VPC, Subnet, and some other resources.
+# This Stack can easily be modified by another vpc.yml simply by uploading into CodeCommit
+# The Stack will get modified if the CloudFormation CICD environment has been created using
+# the IAC-CICD-CodePipeline-Deployment.yml template.
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Simple IAC Test VPC Stack Template
+
+Parameters:
+  VpcCIDRblock:
+    Type: String
+    Description: CIDR Block for entire VPC
+      
+  Subnet01Block:
+    Type: String
+    Description: CIDR Block for Subnet 01        
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Dev VPC Network Configuration
+          Parameters:
+            - VpcCIDRblock
+            - Subnet01Block        
+    ParameterLabels:
+      VpcCIDRblock:
+        default: VPC CIDR Range selection                        
+
+Resources:
+  IACtestVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDRblock
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-IACtestVPC"
+
+  Subnet01:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref IACtestVPC
+      CidrBlock: !Ref Subnet01Block 
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-Subnet01"    
+      AvailabilityZone: 
+        Fn::Select:
+          - '0'
+          - Fn::GetAZs:
+              Ref: AWS::Region
+
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref IACtestVPC               
+      Tags: 
+        - Key: Name
+          Value: Public Subnets
+        - Key: Network
+          Value: Public          
+
+  Subnet01RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet01
+      RouteTableId: !Ref RouteTable
+      
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref IACtestVPC    
+
+  Route: 
+    DependsOn: VPCGatewayAttachment
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable  
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway    
+
+Outputs:
+  Subnet01Id:
+    Description: Subnet 01 Id
+    Value: !Ref Subnet01
+
+  VpcId:
+    Description: VPC Id
+    Value: !Ref IACtestVPC      
