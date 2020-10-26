@@ -1,5 +1,8 @@
 # Create a CICD environment for orchestrating CloudFormation stack changes
 # Ensure a buildspec.yml is found in the CodeCommit repository
+# Also ensure that the hard-coded file names in buildspec.yml match what is entered
+# below for TemplateConfigurationValue and TemplatePathValue.
+# 
 
 AWSTemplateFormatVersion: 2010-09-09
 
@@ -19,12 +22,12 @@ Parameters:
     ConstraintDescription: Must be a valid email address.
   TemplateConfigurationValue:
     Type: String
-    Description: CloudFormation Template Configuration file name found in CodeCommit
-    Default: vpc-config.json
+    Description: CloudFormation Template Configuration file name must match what is in CodeCommit
+    Default: tmplt-param-vals.json
   TemplatePathValue:
     Type: String
-    Description: CloudFormation Template file name found in CodeCommit
-    Default: vpc.yml
+    Description: CloudFormation Template file name must match what is in CodeCommit
+    Default: test-template.yml
 
 Resources:
   CodeBuildRole:
