@@ -4,8 +4,8 @@ Description: Create CodeDeploy Stack Template
 Parameters:
   ApplicationRepoName:
     Type: String
-    Description: Name of the CodeCommit repository which contains the REST application
-    Default: simpleRESTapp
+    Description: Name of the CodeCommit repository which contains the test REST application
+    Default: simpletestapp
   ArtifactStoreS3Location:
     Type: String
     Description: Name of S3 bucket
