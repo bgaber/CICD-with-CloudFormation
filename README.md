@@ -1,6 +1,6 @@
 # CICD CloudFormation
 
-![Alt text](aws_codepipeline.png?raw=true "AWS CodePipeline CICD")
+![Alt text](images/aws_codepipeline.png?raw=true "AWS CodePipeline CICD")
 
 Some CloudFormation Templates that will create a complete CICD CodePipeline deployments.
 
